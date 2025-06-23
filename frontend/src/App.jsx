@@ -32,8 +32,6 @@ const AppContent = () => {
         ) : (
           <Register onToggleMode={() => setIsLoginMode(true)} />
         )}
-        {/* Add debug component in development */}
-        {/* {process.env.NODE_ENV === "development" && <ApiDebug />} */}
       </>
     );
   }
@@ -44,8 +42,7 @@ const AppContent = () => {
       {error && (
         <ErrorNotification message={error} onClose={() => setError(null)} />
       )}
-      {/* Add debug component in development */}
-      {/* {process.env.NODE_ENV === "development" && <ApiDebug />} */}
+    
     </>
   );
 };
