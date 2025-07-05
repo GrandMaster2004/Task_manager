@@ -6,7 +6,7 @@ import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import ErrorNotification from "./components/ErrorNotification";
-// import ApiDebug from "./components/ApiDebug";
+
 
 const AppContent = () => {
   const { user, loading } = useAuth();

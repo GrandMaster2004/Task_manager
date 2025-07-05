@@ -1,201 +1,237 @@
-import { useState, useEffect } from "react";
-import {
-  Plus,
-  Home,
-  Clock,
-  CheckCircle,
-  BarChart3,
-  Settings,
-  MoreHorizontal,
-  Menu,
-  X,
-  LogOut,
-} from "lucide-react";
-import { useAuth } from "../context/AuthContext";
-import apiService from "../services/api";
-import TaskModal from "./TaskModal";
+
+import { useState, useEffect } from "react"
+import { Plus, Home, Clock, CheckCircle, BarChart3, Settings, MoreHorizontal, Menu, X, LogOut } from "lucide-react"
+import { useAuth } from "../context/AuthContext"
+import apiService from "../services/api"
+import TaskModal from "./TaskModal"
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const [error, setError] = useState(null);
+  const { user, logout } = useAuth()
+  const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showTaskModal, setShowTaskModal] = useState(false)
+  const [selectedTask, setSelectedTask] = useState(null)
+  const [activeFilter, setActiveFilter] = useState("All")
+  const [activeView, setActiveView] = useState("dashboard") // New state for sidebar navigation
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    fetchTasks()
+  }, [])
 
   const fetchTasks = async () => {
     try {
-      setLoading(true);
-      console.log("Fetching tasks..."); // Debug log
-      const response = await apiService.getTasks();
-      console.log("Tasks response:", response); // Debug log
+      setLoading(true)
+      console.log("Fetching tasks...") // Debug log
+      const response = await apiService.getTasks()
+      console.log("Tasks response:", response) // Debug log
 
       if (response.success) {
-        setTasks(response.tasks || []);
-        setError(null);
+        setTasks(response.tasks || [])
+        setError(null)
       } else {
-        console.error("Failed to fetch tasks:", response.message);
-        setTasks([]);
-        setError(response.message || "Failed to fetch tasks");
+        console.error("Failed to fetch tasks:", response.message)
+        setTasks([])
+        setError(response.message || "Failed to fetch tasks")
       }
     } catch (error) {
-      console.error("Failed to fetch tasks:", error);
-      setTasks([]);
-      setError(error.message);
+      console.error("Failed to fetch tasks:", error)
+      setTasks([])
+      setError(error.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleCreateTask = async (taskData) => {
     try {
-      console.log("Creating task with data:", taskData); // Debug log
-      const response = await apiService.createTask(taskData);
-      console.log("Create task response:", response); // Debug log
+      console.log("Creating task with data:", taskData) // Debug log
+      const response = await apiService.createTask(taskData)
+      console.log("Create task response:", response) // Debug log
 
       if (response.success && response.task) {
-        setTasks([response.task, ...tasks]);
-        setShowTaskModal(false);
-        setError(null);
+        setTasks([response.task, ...tasks])
+        setShowTaskModal(false)
+        setError(null)
       } else {
-        console.error("Failed to create task:", response.message);
-        setError(response.message || "Failed to create task");
+        console.error("Failed to create task:", response.message)
+        setError(response.message || "Failed to create task")
       }
     } catch (error) {
-      console.error("Failed to create task:", error);
-      setError(error.message);
+      console.error("Failed to create task:", error)
+      setError(error.message)
     }
-  };
+  }
 
   const handleUpdateTask = async (taskId, taskData) => {
     try {
-      console.log("Updating task:", taskId, "with data:", taskData); // Debug log
-      const response = await apiService.updateTask(taskId, taskData);
-      console.log("Update task response:", response); // Debug log
+      console.log("Updating task:", taskId, "with data:", taskData) // Debug log
+      const response = await apiService.updateTask(taskId, taskData)
+      console.log("Update task response:", response) // Debug log
 
       if (response.success && response.task) {
-        setTasks(
-          tasks.map((task) => (task._id === taskId ? response.task : task))
-        );
-        setShowTaskModal(false);
-        setSelectedTask(null);
-        setError(null);
+        setTasks(tasks.map((task) => (task._id === taskId ? response.task : task)))
+        setShowTaskModal(false)
+        setSelectedTask(null)
+        setError(null)
       } else {
-        console.error("Failed to update task:", response.message);
-        setError(response.message || "Failed to update task");
+        console.error("Failed to update task:", response.message)
+        setError(response.message || "Failed to update task")
       }
     } catch (error) {
-      console.error("Failed to update task:", error);
-      setError(error.message);
+      console.error("Failed to update task:", error)
+      setError(error.message)
     }
-  };
+  }
 
   const handleDeleteTask = async (taskId) => {
     try {
-      console.log("Deleting task:", taskId); // Debug log
-      const response = await apiService.deleteTask(taskId);
-      console.log("Delete task response:", response); // Debug log
+      console.log("Deleting task:", taskId) // Debug log
+      const response = await apiService.deleteTask(taskId)
+      console.log("Delete task response:", response) // Debug log
 
       if (response.success) {
-        setTasks(tasks.filter((task) => task._id !== taskId));
-        setShowTaskModal(false);
-        setSelectedTask(null);
-        setError(null);
+        setTasks(tasks.filter((task) => task._id !== taskId))
+        setShowTaskModal(false)
+        setSelectedTask(null)
+        setError(null)
       } else {
-        console.error("Failed to delete task:", response.message);
-        setError(response.message || "Failed to delete task");
+        console.error("Failed to delete task:", response.message)
+        setError(response.message || "Failed to delete task")
       }
     } catch (error) {
-      console.error("Failed to delete task:", error);
-      setError(error.message);
+      console.error("Failed to delete task:", error)
+      setError(error.message)
     }
-  };
+  }
 
   const handleToggleComplete = async (taskId, completed) => {
     try {
-      const task = tasks.find((t) => t._id === taskId);
-      if (!task) return;
+      const task = tasks.find((t) => t._id === taskId)
+      if (!task) return
 
       const updatedTaskData = {
         ...task,
         completed: completed,
-      };
+      }
 
-      await handleUpdateTask(taskId, updatedTaskData);
+      await handleUpdateTask(taskId, updatedTaskData)
     } catch (error) {
-      console.error("Failed to toggle task completion:", error);
-      setError(error.message);
+      console.error("Failed to toggle task completion:", error)
+      setError(error.message)
     }
-  };
+  }
 
   const handleLogout = () => {
-    logout();
-    setShowUserMenu(false);
-  };
+    logout()
+    setShowUserMenu(false)
+  }
+
+  // Handle sidebar navigation
+  const handleSidebarNavigation = (view) => {
+    setActiveView(view)
+    setSidebarOpen(false) // Close mobile sidebar when navigating
+
+    // Set appropriate filters based on the view
+    if (view === "pending") {
+      setActiveFilter("Pending")
+    } else if (view === "completed") {
+      setActiveFilter("Completed")
+    } else {
+      setActiveFilter("All")
+    }
+  }
 
   const getTaskStats = () => {
-    const total = tasks.length;
-    const completed = tasks.filter((task) => task.completed).length;
-    const pending = total - completed;
-    const lowPriority = tasks.filter((task) => task.priority === "Low").length;
-    const mediumPriority = tasks.filter(
-      (task) => task.priority === "Medium"
-    ).length;
-    const highPriority = tasks.filter(
-      (task) => task.priority === "High"
-    ).length;
-    const completionRate =
-      total > 0 ? Math.round((completed / total) * 100) : 0;
+    const total = tasks.length
+    const completed = tasks.filter((task) => task.completed).length
+    const pending = total - completed
+    const lowPriority = tasks.filter((task) => task.priority === "Low").length
+    const mediumPriority = tasks.filter((task) => task.priority === "Medium").length
+    const highPriority = tasks.filter((task) => task.priority === "High").length
+    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0
 
-    return {
-      total,
-      completed,
-      pending,
-      lowPriority,
-      mediumPriority,
-      highPriority,
-      completionRate,
-    };
-  };
+    return { total, completed, pending, lowPriority, mediumPriority, highPriority, completionRate }
+  }
 
-  const stats = getTaskStats();
+  const stats = getTaskStats()
 
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "Low":
-        return "text-green-600 bg-green-100";
+        return "text-green-600 bg-green-100"
       case "Medium":
-        return "text-orange-600 bg-orange-100";
+        return "text-orange-600 bg-orange-100"
       case "High":
-        return "text-red-600 bg-red-100";
+        return "text-red-600 bg-red-100"
       default:
-        return "text-gray-600 bg-gray-100";
+        return "text-gray-600 bg-gray-100"
     }
-  };
+  }
 
-  const filteredTasks = tasks.filter((task) => {
-    if (activeFilter === "All") return true;
+  // Updated filtering logic to handle sidebar navigation
+  const getFilteredTasks = () => {
+    let filtered = tasks
+
+    // First filter by sidebar navigation
+    if (activeView === "pending") {
+      filtered = tasks.filter((task) => !task.completed)
+    } else if (activeView === "completed") {
+      filtered = tasks.filter((task) => task.completed)
+    }
+
+    // Then apply additional filters
+    if (activeFilter === "All" || activeFilter === "Pending" || activeFilter === "Completed") {
+      return filtered
+    }
+
     if (activeFilter === "Today") {
-      if (!task.dueDate) return false;
-      return (
-        new Date(task.dueDate).toDateString() === new Date().toDateString()
-      );
+      return filtered.filter((task) => {
+        if (!task.dueDate) return false
+        return new Date(task.dueDate).toDateString() === new Date().toDateString()
+      })
     }
+
     if (activeFilter === "Week") {
-      if (!task.dueDate) return false;
-      const weekFromNow = new Date();
-      weekFromNow.setDate(weekFromNow.getDate() + 7);
-      return new Date(task.dueDate) <= weekFromNow;
+      return filtered.filter((task) => {
+        if (!task.dueDate) return false
+        const weekFromNow = new Date()
+        weekFromNow.setDate(weekFromNow.getDate() + 7)
+        return new Date(task.dueDate) <= weekFromNow
+      })
     }
-    return task.priority === activeFilter;
-  });
+
+    // Filter by priority
+    return filtered.filter((task) => task.priority === activeFilter)
+  }
+
+  const filteredTasks = getFilteredTasks()
+
+  // Get page title based on active view
+  const getPageTitle = () => {
+    switch (activeView) {
+      case "pending":
+        return "Pending Tasks"
+      case "completed":
+        return "Completed Tasks"
+      default:
+        return "Task Overview"
+    }
+  }
+
+  // Get page description based on active view
+  const getPageDescription = () => {
+    switch (activeView) {
+      case "pending":
+        return `You have ${stats.pending} pending tasks to complete`
+      case "completed":
+        return `You have completed ${stats.completed} tasks`
+      default:
+        return "Manage your tasks efficiently"
+    }
+  }
 
   if (loading) {
     return (
@@ -205,7 +241,7 @@ const Dashboard = () => {
           <p className="text-gray-600">Loading your tasks...</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -215,10 +251,7 @@ const Dashboard = () => {
         <div className="fixed top-4 right-4 z-50 bg-red-500 text-white p-4 rounded-lg shadow-lg max-w-sm">
           <div className="flex items-center justify-between">
             <span className="text-sm">{error}</span>
-            <button
-              onClick={() => setError(null)}
-              className="ml-2 text-white hover:text-gray-200"
-            >
+            <button onClick={() => setError(null)} className="ml-2 text-white hover:text-gray-200">
               <X size={16} />
             </button>
           </div>
@@ -227,17 +260,12 @@ const Dashboard = () => {
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* Sidebar */}
       <div
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-sm border-r border-gray-200 transform ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 transition-transform duration-300 ease-in-out`}
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-sm border-r border-gray-200 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 transition-transform duration-300 ease-in-out`}
       >
         <div className="p-4 lg:p-6">
           <div className="flex items-center justify-between mb-6 lg:mb-8">
@@ -247,10 +275,7 @@ const Dashboard = () => {
               </div>
               <span className="text-xl font-bold text-gray-800">TaskFlow</span>
             </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden text-gray-500 hover:text-gray-700"
-            >
+            <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-gray-700">
               <X size={24} />
             </button>
           </div>
@@ -258,63 +283,63 @@ const Dashboard = () => {
           <div className="mb-6">
             <div className="flex items-center space-x-3 mb-2">
               <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold">
-                  {user?.name?.charAt(0)}
-                </span>
+                <span className="text-white font-semibold">{user?.name?.charAt(0)}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-800 truncate">
-                  Hey, {user?.name}
-                </p>
-                <p className="text-sm text-purple-500">
-                  🚀 Let's crush some tasks!
-                </p>
+                <p className="font-medium text-gray-800 truncate">Hey, {user?.name}</p>
+                <p className="text-sm text-purple-500">🚀 Let's crush some tasks!</p>
               </div>
             </div>
           </div>
 
           <div className="mb-6">
             <div className="text-sm text-gray-500 mb-2">PRODUCTIVITY</div>
-            <div className="text-2xl font-bold text-purple-500">
-              {stats.completionRate}%
-            </div>
+            <div className="text-2xl font-bold text-purple-500">{stats.completionRate}%</div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-purple-500 h-2 rounded-full"
-                style={{ width: `${stats.completionRate}%` }}
-              ></div>
+              <div className="bg-purple-500 h-2 rounded-full" style={{ width: `${stats.completionRate}%` }}></div>
             </div>
           </div>
 
+          {/* Updated Navigation */}
           <nav className="space-y-2">
-            <a
-              href="#"
-              className="flex items-center space-x-3 px-3 py-2 rounded-lg bg-purple-50 text-purple-600"
+            <button
+              onClick={() => handleSidebarNavigation("dashboard")}
+              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                activeView === "dashboard" ? "bg-purple-50 text-purple-600" : "text-gray-600 hover:bg-gray-50"
+              }`}
             >
               <Home size={20} />
               <span>Dashboard</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50"
+            </button>
+            <button
+              onClick={() => handleSidebarNavigation("pending")}
+              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                activeView === "pending" ? "bg-purple-50 text-purple-600" : "text-gray-600 hover:bg-gray-50"
+              }`}
             >
               <Clock size={20} />
               <span>Pending Tasks</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50"
+              <span className="ml-auto bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded-full">
+                {stats.pending}
+              </span>
+            </button>
+            <button
+              onClick={() => handleSidebarNavigation("completed")}
+              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                activeView === "completed" ? "bg-purple-50 text-purple-600" : "text-gray-600 hover:bg-gray-50"
+              }`}
             >
               <CheckCircle size={20} />
               <span>Completed Tasks</span>
-            </a>
+              <span className="ml-auto bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">
+                {stats.completed}
+              </span>
+            </button>
           </nav>
 
           <div className="mt-8 p-4 bg-purple-50 rounded-lg">
             <h3 className="font-semibold text-purple-800 mb-2">Pro Tip</h3>
-            <p className="text-sm text-purple-600 mb-3">
-              Use keyboard shortcuts to boost productivity!
-            </p>
+            <p className="text-sm text-purple-600 mb-3">Use keyboard shortcuts to boost productivity!</p>
             <a href="#" className="text-sm text-purple-500 underline">
               Visit Hexagon Digital Services
             </a>
@@ -327,10 +352,7 @@ const Dashboard = () => {
         <div className="flex-1 p-4 lg:p-6">
           {/* Mobile Header */}
           <div className="flex items-center justify-between mb-6 lg:hidden">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="text-gray-600 hover:text-gray-800"
-            >
+            <button onClick={() => setSidebarOpen(true)} className="text-gray-600 hover:text-gray-800">
               <Menu size={24} />
             </button>
             <div className="flex items-center space-x-2">
@@ -344,9 +366,7 @@ const Dashboard = () => {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center"
               >
-                <span className="text-white text-sm font-semibold">
-                  {user?.name?.charAt(0)}
-                </span>
+                <span className="text-white text-sm font-semibold">{user?.name?.charAt(0)}</span>
               </button>
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
@@ -370,10 +390,12 @@ const Dashboard = () => {
           <div className="hidden lg:flex items-center justify-between mb-8">
             <div>
               <h1 className="text-2xl font-bold text-gray-800 flex items-center">
-                <Home className="mr-2" size={24} />
-                Task Overview
+                {activeView === "dashboard" && <Home className="mr-2" size={24} />}
+                {activeView === "pending" && <Clock className="mr-2" size={24} />}
+                {activeView === "completed" && <CheckCircle className="mr-2" size={24} />}
+                {getPageTitle()}
               </h1>
-              <p className="text-gray-600">Manage your tasks efficiently</p>
+              <p className="text-gray-600">{getPageDescription()}</p>
             </div>
             <button
               onClick={() => setShowTaskModal(true)}
@@ -384,87 +406,85 @@ const Dashboard = () => {
             </button>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-            <div className="bg-white p-4 lg:p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xl lg:text-2xl font-bold text-gray-800">
-                    {stats.total}
-                  </p>
-                  <p className="text-sm lg:text-base text-gray-600">
-                    Total Tasks
-                  </p>
-                </div>
-                <Home className="text-purple-500" size={20} />
-              </div>
-            </div>
-            <div className="bg-white p-4 lg:p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xl lg:text-2xl font-bold text-green-600">
-                    {stats.lowPriority}
-                  </p>
-                  <p className="text-sm lg:text-base text-gray-600">
-                    Low Priority
-                  </p>
-                </div>
-                <div className="w-5 h-5 lg:w-6 lg:h-6 bg-green-100 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
+          {/* Stats Cards - Only show on dashboard */}
+          {activeView === "dashboard" && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+              <div className="bg-white p-4 lg:p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xl lg:text-2xl font-bold text-gray-800">{stats.total}</p>
+                    <p className="text-sm lg:text-base text-gray-600">Total Tasks</p>
+                  </div>
+                  <Home className="text-purple-500" size={20} />
                 </div>
               </div>
-            </div>
-            <div className="bg-white p-4 lg:p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xl lg:text-2xl font-bold text-orange-600">
-                    {stats.mediumPriority}
-                  </p>
-                  <p className="text-sm lg:text-base text-gray-600">
-                    Medium Priority
-                  </p>
-                </div>
-                <div className="w-5 h-5 lg:w-6 lg:h-6 bg-orange-100 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 lg:w-3 lg:h-3 bg-orange-500 rounded-full"></div>
+              <div className="bg-white p-4 lg:p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xl lg:text-2xl font-bold text-green-600">{stats.lowPriority}</p>
+                    <p className="text-sm lg:text-base text-gray-600">Low Priority</p>
+                  </div>
+                  <div className="w-5 h-5 lg:w-6 lg:h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="bg-white p-4 lg:p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xl lg:text-2xl font-bold text-red-600">
-                    {stats.highPriority}
-                  </p>
-                  <p className="text-sm lg:text-base text-gray-600">
-                    High Priority
-                  </p>
+              <div className="bg-white p-4 lg:p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xl lg:text-2xl font-bold text-orange-600">{stats.mediumPriority}</p>
+                    <p className="text-sm lg:text-base text-gray-600">Medium Priority</p>
+                  </div>
+                  <div className="w-5 h-5 lg:w-6 lg:h-6 bg-orange-100 rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 lg:w-3 lg:h-3 bg-orange-500 rounded-full"></div>
+                  </div>
                 </div>
-                <div className="w-5 h-5 lg:w-6 lg:h-6 bg-red-100 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 lg:w-3 lg:h-3 bg-red-500 rounded-full"></div>
+              </div>
+              <div className="bg-white p-4 lg:p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xl lg:text-2xl font-bold text-red-600">{stats.highPriority}</p>
+                    <p className="text-sm lg:text-base text-gray-600">High Priority</p>
+                  </div>
+                  <div className="w-5 h-5 lg:w-6 lg:h-6 bg-red-100 rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 lg:w-3 lg:h-3 bg-red-500 rounded-full"></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Filter Tabs */}
+          {/* Filter Tabs - Updated to exclude Pending/Completed when in specific views */}
           <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
             <span className="text-gray-600 font-medium">Filter:</span>
             <div className="flex flex-wrap gap-2">
-              {["All", "Today", "Week", "High", "Medium", "Low"].map(
-                (filter) => (
-                  <button
-                    key={filter}
-                    onClick={() => setActiveFilter(filter)}
-                    className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                      activeFilter === filter
-                        ? "bg-purple-500 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                  >
-                    {filter}
-                  </button>
-                )
-              )}
+              {activeView === "dashboard"
+                ? ["All", "Today", "Week", "High", "Medium", "Low"].map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => setActiveFilter(filter)}
+                      className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                        activeFilter === filter
+                          ? "bg-purple-500 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      {filter}
+                    </button>
+                  ))
+                : ["All", "Today", "Week", "High", "Medium", "Low"].map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => setActiveFilter(filter)}
+                      className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                        activeFilter === filter
+                          ? "bg-purple-500 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      {filter}
+                    </button>
+                  ))}
             </div>
           </div>
 
@@ -473,15 +493,19 @@ const Dashboard = () => {
             {filteredTasks.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-gray-400" />
+                  {activeView === "pending" && <Clock className="w-8 h-8 text-gray-400" />}
+                  {activeView === "completed" && <CheckCircle className="w-8 h-8 text-gray-400" />}
+                  {activeView === "dashboard" && <Home className="w-8 h-8 text-gray-400" />}
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  No tasks found
+                  {activeView === "pending" && "No pending tasks"}
+                  {activeView === "completed" && "No completed tasks"}
+                  {activeView === "dashboard" && "No tasks found"}
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  {activeFilter === "All"
-                    ? "Create your first task to get started!"
-                    : `No ${activeFilter.toLowerCase()} tasks found.`}
+                  {activeView === "pending" && "Great! You're all caught up."}
+                  {activeView === "completed" && "Complete some tasks to see them here."}
+                  {activeView === "dashboard" && "Create your first task to get started!"}
                 </p>
                 <button
                   onClick={() => setShowTaskModal(true)}
@@ -502,59 +526,41 @@ const Dashboard = () => {
                       <input
                         type="checkbox"
                         checked={task.completed}
-                        onChange={(e) =>
-                          handleToggleComplete(task._id, e.target.checked)
-                        }
+                        onChange={(e) => handleToggleComplete(task._id, e.target.checked)}
                         className="w-5 h-5 text-purple-500 rounded focus:ring-purple-500 mt-1 sm:mt-0"
                       />
                       <div className="flex-1 min-w-0">
                         <h3
-                          className={`font-medium text-sm sm:text-base ${
-                            task.completed
-                              ? "line-through text-gray-500"
-                              : "text-gray-800"
-                          }`}
+                          className={`font-medium text-sm sm:text-base ${task.completed ? "line-through text-gray-500" : "text-gray-800"}`}
                         >
                           {task.title}
                         </h3>
                         {task.description && (
-                          <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                            {task.description}
-                          </p>
+                          <p className="text-xs sm:text-sm text-gray-600 mt-1">{task.description}</p>
                         )}
                         <div className="flex flex-wrap items-center gap-2 mt-2 sm:hidden">
                           <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-                              task.priority
-                            )}`}
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}
                           >
                             {task.priority}
                           </span>
                           {task.dueDate && (
-                            <span className="text-xs text-gray-500">
-                              {new Date(task.dueDate).toLocaleDateString()}
-                            </span>
+                            <span className="text-xs text-gray-500">{new Date(task.dueDate).toLocaleDateString()}</span>
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="hidden sm:flex items-center space-x-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-                          task.priority
-                        )}`}
-                      >
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
                         {task.priority}
                       </span>
                       {task.dueDate && (
-                        <span className="text-sm text-gray-500">
-                          {new Date(task.dueDate).toLocaleDateString()}
-                        </span>
+                        <span className="text-sm text-gray-500">{new Date(task.dueDate).toLocaleDateString()}</span>
                       )}
                       <button
                         onClick={() => {
-                          setSelectedTask(task);
-                          setShowTaskModal(true);
+                          setSelectedTask(task)
+                          setShowTaskModal(true)
                         }}
                         className="text-gray-400 hover:text-gray-600"
                       >
@@ -563,8 +569,8 @@ const Dashboard = () => {
                     </div>
                     <button
                       onClick={() => {
-                        setSelectedTask(task);
-                        setShowTaskModal(true);
+                        setSelectedTask(task)
+                        setShowTaskModal(true)
                       }}
                       className="sm:hidden text-gray-400 hover:text-gray-600"
                     >
@@ -594,10 +600,7 @@ const Dashboard = () => {
               Task Statistics
             </h2>
             <div className="relative">
-              <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="text-gray-400 hover:text-gray-600"
-              >
+              <button onClick={() => setShowUserMenu(!showUserMenu)} className="text-gray-400 hover:text-gray-600">
                 <Settings size={20} />
               </button>
               {showUserMenu && (
@@ -620,30 +623,22 @@ const Dashboard = () => {
 
           <div className="space-y-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-500 mb-1">
-                {stats.total}
-              </div>
+              <div className="text-3xl font-bold text-purple-500 mb-1">{stats.total}</div>
               <div className="text-gray-600">Total Tasks</div>
             </div>
 
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-500 mb-1">
-                {stats.completed}
-              </div>
+              <div className="text-3xl font-bold text-blue-500 mb-1">{stats.completed}</div>
               <div className="text-gray-600">Completed</div>
             </div>
 
             <div className="text-center">
-              <div className="text-3xl font-bold text-orange-500 mb-1">
-                {stats.pending}
-              </div>
+              <div className="text-3xl font-bold text-orange-500 mb-1">{stats.pending}</div>
               <div className="text-gray-600">Pending</div>
             </div>
 
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-500 mb-1">
-                {stats.completionRate}%
-              </div>
+              <div className="text-3xl font-bold text-purple-500 mb-1">{stats.completionRate}%</div>
               <div className="text-gray-600">Completion Rate</div>
             </div>
 
@@ -653,10 +648,7 @@ const Dashboard = () => {
                 Task Progress
               </h3>
               <div className="w-full bg-gray-200 rounded-full h-3">
-                <div
-                  className="bg-purple-500 h-3 rounded-full"
-                  style={{ width: `${stats.completionRate}%` }}
-                ></div>
+                <div className="bg-purple-500 h-3 rounded-full" style={{ width: `${stats.completionRate}%` }}></div>
               </div>
               <div className="text-right text-sm text-gray-600 mt-1">
                 {stats.completed}/{stats.total}
@@ -670,23 +662,14 @@ const Dashboard = () => {
               </h3>
               <div className="space-y-3">
                 {tasks.slice(0, 3).map((task) => (
-                  <div
-                    key={task._id}
-                    className="flex items-center justify-between"
-                  >
+                  <div key={task._id} className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">
-                        {task.title}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(task.createdAt).toLocaleDateString()}
-                      </p>
+                      <p className="text-sm font-medium text-gray-800 truncate">{task.title}</p>
+                      <p className="text-xs text-gray-500">{new Date(task.createdAt).toLocaleDateString()}</p>
                     </div>
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        task.completed
-                          ? "bg-green-100 text-green-600"
-                          : "bg-orange-100 text-orange-600"
+                        task.completed ? "bg-green-100 text-green-600" : "bg-orange-100 text-orange-600"
                       }`}
                     >
                       {task.completed ? "Done" : "Pending"}
@@ -712,21 +695,15 @@ const Dashboard = () => {
         <TaskModal
           task={selectedTask}
           onClose={() => {
-            setShowTaskModal(false);
-            setSelectedTask(null);
+            setShowTaskModal(false)
+            setSelectedTask(null)
           }}
-          onSave={
-            selectedTask
-              ? (taskData) => handleUpdateTask(selectedTask._id, taskData)
-              : handleCreateTask
-          }
-          onDelete={
-            selectedTask ? () => handleDeleteTask(selectedTask._id) : null
-          }
+          onSave={selectedTask ? (taskData) => handleUpdateTask(selectedTask._id, taskData) : handleCreateTask}
+          onDelete={selectedTask ? () => handleDeleteTask(selectedTask._id) : null}
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard
