@@ -6,7 +6,7 @@ import { connectDB } from "./config/db.js";
 import userRouter from "./routes/userRoute.js";
 import taskRouter from "./routes/taskRouter.js";
 
-const allowedOrigins = ["https://task-manager-ase4.vercel.app"];
+const allowedOrigins = ["http://localhost:5173"];
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -15,7 +15,7 @@ const port = process.env.PORT || 4000;
 app.use(
   cors({
     origin: allowedOrigins,
-    credentials: true,
+    // credentials: true,
   })
 );
 app.use(express.json());
